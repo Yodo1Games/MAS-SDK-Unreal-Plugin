@@ -6,14 +6,16 @@
 	"Description": "Wrapper of native Android and iOS SDK's for Yodo MAS",
 	"Category": "Code Plugins",
 	"CreatedBy": "Yodo1",
-	"CreatedByURL": "",
-	"DocsURL": "",
+	"CreatedByURL": "https://www.yodo1.com/",
+	"DocsURL": "https://developers.yodo1.com/docs/sdk/getting_started/installing/unreal",
 	"MarketplaceURL": "",
+	"EngineVersion": "5.5.1",
 	"SupportURL": "",
 	"CanContainContent": true,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
 	"Installed": true,
+	"EnablePodSupport": true,
 	"Modules": [
 		{
 			"Name": "YodoAds",
