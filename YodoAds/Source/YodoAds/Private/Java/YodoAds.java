@@ -90,6 +90,7 @@ public class YodoAds {
 	public static native void OnRewardedAdClosed();
 
 	public static native void OnRewardedAdRewardEarned();
+	public static native void OnRewardAdPayRevenue(Yodo1MasAdValue adValue);
 
 
 	public static native void OnInterstitialAdOpened();
@@ -99,6 +100,17 @@ public class YodoAds {
 	public static native void OnInterstitialAdError(String error);
 
 	public static native void OnInterstitialAdClosed();
+    public static native void OnInterstitialAdPayRevenue(Yodo1MasAdValue adValue);
+
+
+    public static native void OnAppOpenAdOpened();
+    public static native void OnAppOpenAdLoaded();
+    public static native void OnAppOpenAdFailedToLoad(String error);
+
+	public static native void OnAppOpenAdFailedToOpen(String error);
+
+	public static native void OnAppOpenAdClosed();
+    public static native void OnAppOpenAdPayRevenue(Yodo1MasAdValue adValue);
 
 	static HashMap<String, Yodo1MasBannerAdView> bannerViews = new HashMap<>();
 
@@ -340,7 +352,11 @@ public class YodoAds {
 						OnRewardedAdRewardEarned();
                     }
 				});
-					
+				//ad.setAdRevenueListener(new Yodo1MasRewardAdRevenueListener() {
+                //    public void onRewardAdPayRevenue(Yodo1MasRewardAd ad, Yodo1MasAdValue adValue) {
+                //            OnRewardedAdPayRevenue(adValue.getRevenue().ToString()+"-"+adValue.getCurrency().ToString());
+                //        }
+                //});
 				ad.autoDelayIfLoadFail = config.autoDelayIfLoadFail;
 				ad.loadAd(activity);
         }
@@ -381,12 +397,61 @@ public class YodoAds {
                     }
                     
                 });
+                //ad.setAdRevenueListener(new Yodo1MasInterstitialAdRevenueListener() {
+                //    public void onInterstitialAdPayRevenue(Yodo1MasInterstitialAd ad, Yodo1MasAdValue adValue) {
+                //            OnInterstitialAdPayRevenue(adValue.getRevenue().ToString()+"-"+adValue.getCurrency().ToString());
+                //        }
+                //});
                 ad.autoDelayIfLoadFail = config.autoDelayIfLoadFail;
                 ad.loadAd(activity);
                 }
                 });
 	}
+    @Keep
+	public static void setAppOpenAdListener(Activity activity) {
+		activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AppOpenAdConfig config = new AppOpenAdConfig();
+                Yodo1MasAppOpenAd ad = Yodo1MasAppOpenAd.getInstance();
+                ad.setAdListener(new Yodo1MasAppOpenAdListener() {
+                    @Override
+                    public void onAppOpenAdLoaded(Yodo1MasAppOpenAd ad) {
+                        OnAppOpenAdLoaded();
+                    }
 
+                    @Override
+                    public void onAppOpenAdFailedToLoad(Yodo1MasAppOpenAd ad, @NonNull Yodo1MasError error) {
+                        OnAppOpenAdFailedToLoad(getErrorString(error));
+                    }
+
+                    @Override
+                    public void onAppOpenAdOpened(Yodo1MasAppOpenAd ad) {
+                        OnAppOpenAdOpened();
+                    }
+
+                    @Override
+                    public void onAppOpenAdFailedToOpen(Yodo1MasAppOpenAd ad, @NonNull Yodo1MasError error) {
+                        OnAppOpenAdFailedToOpen(getErrorString(error));
+                    }
+
+                    @Override
+                    public void onAppOpenAdClosed(Yodo1MasAppOpenAd ad) {
+                        OnAppOpenAdClosed();
+                        ad.loadAd(activity);
+                    }
+                    
+                });
+                //ad.setAdRevenueListener(new Yodo1MasAppOpenAdRevenueListener() {
+                //    public void onAppOpenAdPayRevenue(Yodo1MasAppOpenAd ad, Yodo1MasAdValue adValue) {
+                //            OnAppOpenAdPayRevenue(adValue.getRevenue().ToString()+"-"+adValue.getCurrency().ToString());
+                //        }
+                //});
+                ad.autoDelayIfLoadFail = config.autoDelayIfLoadFail;
+                ad.loadAd(activity);
+                }
+                });
+	}
 	@Keep
 	public static boolean isRewardedAdLoaded() {
 		return Yodo1MasRewardAd.getInstance().isLoaded();
@@ -452,6 +517,32 @@ public class YodoAds {
             }
         });
 	}
+    @Keep
+	public static boolean isAppOpenAdLoaded() {
+		return Yodo1MasAppOpenAd.getInstance().isLoaded();
+	}
+
+	@Keep
+	public static void showAppOpenAd(Activity activity, String placement) {
+		activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AppOpenAdConfig config = new AppOpenAdConfig();
+                Yodo1MasAppOpenAd.getInstance().showAd(activity, config.adPlacement, config.customData);
+            }
+        });
+	}
+
+    @Keep
+	public static void loadAppOpenAd(Activity activity, String placement) {
+		activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                AppOpenAdConfig config = new AppOpenAdConfig();
+                Yodo1MasAppOpenAd.getInstance().loadAd(activity);
+            }
+        });
+	}
 	private static void setBannerPosition(Activity activity, Yodo1MasBannerAdView view, ViewGroup.LayoutParams params, int alignmentHorizontal,
 	                                      int alignmentVertical, int offsetX, int offsetY) {
 		DisplayMetrics displayMetrics = activity.getResources().getDisplayMetrics();
@@ -498,6 +589,7 @@ public class YodoAds {
 		return error.getCode() + " - " + error.getMessage();
 	}
 
+    
 	private static Yodo1MasBannerAdSize parseSize(int size) {
 		switch (size) {
 			case 1:
@@ -546,7 +638,39 @@ public static class RewardAdConfig {
             return false;
         }
     }
+public static class AppOpenAdConfig {
+        public String adPlacement = null;
+        public String customData = null;
+        public boolean autoDelayIfLoadFail = false;
+        public int payRevenueEventCount;
 
+        public boolean parseAdConfig(String jsonParam) {
+            try {
+                JsonElement jsonElement = JsonParser.parseString(jsonParam);
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                if (jsonObject == null) {
+                    return false;
+                }
+
+                if (jsonObject.has("adPlacement")) {
+                    adPlacement = jsonObject.get("adPlacement").getAsString();
+                }
+                if (jsonObject.has("customData")) {
+                    customData = jsonObject.get("customData").getAsString();
+                }
+                if (jsonObject.has("autoDelayIfLoadFail")) {
+                    autoDelayIfLoadFail = jsonObject.get("autoDelayIfLoadFail").getAsBoolean();
+                }
+                if (jsonObject.has("payRevenueEventCount")) {
+                    payRevenueEventCount = jsonObject.get("payRevenueEventCount").getAsInt();
+                }
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
 public static class InterstitialAdConfig {
         public String adPlacement = null;
         public String customData = null;

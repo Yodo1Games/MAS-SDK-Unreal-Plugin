@@ -140,7 +140,7 @@ public:
 	 * @param OnError - callback to be invoked with the error message if something goes wrong.
 	 * @param OnClosed - callback to be invoked after the ad is closed.
 	 * @param OnLoaded - callback to be invoked after the ad is Loaded.
-	 * @param OnLoadFailed - callback to be invoked after the ad failed to Load	.
+	 * @param OnLoadFailed - callback to be invoked after the ad failed to Load	..
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Yodo Ads", meta = (AutoCreateRefTerm = "OnOpened,OnError,OnClosed,OnLoaded,OnLoadFailed"))
 	static void SetInterstitialAdListener(const FYAVoidDelegate& OnOpened, const FYAErrorDelegate& OnError, const FYAVoidDelegate& OnClosed, const FYAVoidDelegate& OnLoaded, const FYAErrorDelegate& OnLoadFailed);
@@ -163,6 +163,35 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Yodo Ads")
 	static void LoadInterstitialAd(const FString& Placement = "");
 
+/**
+	* Set global app open ad callbacks.
+	 *
+	 * @param OnOpened - callback to be invoked after the ad is opened.
+	 * @param OnError - callback to be invoked with the error message if something goes wrong.
+	 * @param OnClosed - callback to be invoked after the ad is closed.
+	 * @param OnLoaded - callback to be invoked after the ad is Loaded.
+	 * @param OnLoadFailed - callback to be invoked after the ad failed to Load	.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Yodo Ads", meta = (AutoCreateRefTerm = "OnOpened,OnError,OnClosed,OnLoaded,OnLoadFailed"))
+	static void setAppOpenAdListener(const FYAVoidDelegate& OnOpened, const FYAErrorDelegate& OnError, const FYAVoidDelegate& OnClosed, const FYAVoidDelegate& OnLoaded, const FYAErrorDelegate& OnLoadFailed);
+
+	/**
+	* Whether next app open ad is loaded.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Yodo Ads")
+	static bool IsAppOpenAdLoaded();
+
+	/**
+	* Show app open ad with optional placement.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Yodo Ads")
+	static void ShowAppOpenAd(const FString& Placement = "");
+
+	/**
+	* Load app open ad with optional placement.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Yodo Ads")
+	static void LoadAppOpenAd(const FString& Placement = "");
 
 	/**
 	* Create a banner ad.
@@ -179,12 +208,21 @@ public:
 	static FYAVoidDelegate OnRewardedAdRewardEarned;
 	static FYAVoidDelegate OnRewardedAdLoaded;
 	static FYAErrorDelegate OnRewardAdFailedToLoad;
+	static FYAErrorDelegate OnRewardAdPayRevenue;
 
 	static FYAVoidDelegate OnInterstitialAdOpened;
 	static FYAErrorDelegate OnInterstitialAdError;
 	static FYAVoidDelegate OnInterstitialAdClosed;
 	static FYAVoidDelegate OnInterstitialAdLoaded;
 	static FYAErrorDelegate OnInterstitialAdFailedToLoad;
+	static FYAErrorDelegate OnInterstitialAdPayRevenue;
+
+	static FYAVoidDelegate OnAppOpenAdOpened;
+	static FYAErrorDelegate OnAppOpenAdError;
+	static FYAVoidDelegate OnAppOpenAdClosed;
+	static FYAVoidDelegate OnAppOpenAdLoaded;
+	static FYAErrorDelegate OnAppOpenAdFailedToLoad;
+	static FYAErrorDelegate OnAppOpenAdPayRevenue;
 
 	static const ANSICHAR* YodoAdsClassName;
 };

@@ -43,6 +43,47 @@
 }
 @end
 
+@implementation YAAppopenAdDelegate
+
+- (void)onAppOpenAdOpened:(Yodo1MasAppOpenAd *)ad {
+    // Code to be executed when an ad opened
+	if (_onAppOpenAdOpened)
+		_onAppOpenAdOpened();
+}
+- (void)onAppOpenAdClosed:(Yodo1MasAppOpenAd *)ad {
+    // Code to be executed when the ad closed
+    if (_onAppOpenAdClosed)
+		_onAppOpenAdClosed();
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[[Yodo1MasAppOpenAd sharedInstance] loadAd];
+	});
+}
+- (void)onAppOpenAdLoaded:(Yodo1MasAppOpenAd *)ad {
+    // Code to be executed when an ad finishes loading.
+    _retryAOAAttempt = 0;
+    if (_onAppOpenAdLoaded)
+		_onAppOpenAdLoaded();
+}
+- (void)onAppOpenAdFailedToOpen:(Yodo1MasAppOpenAd *)ad withError:(Yodo1MasError *)error {
+    // Code to be executed when an ad open fails.
+		dispatch_async(dispatch_get_main_queue(), ^{
+			[[Yodo1MasAppOpenAd sharedInstance] loadAd];
+		});
+	if (_onAppOpenAdFailedToOpen)
+		_onAppOpenAdFailedToOpen(error);
+}
+- (void)onAppOpenAdFailedToLoad:(Yodo1MasAppOpenAd *)ad withError:(Yodo1MasError *)error {
+    // Code to be executed when an ad request fails.
+    _retryAOAAttempt++;
+    NSInteger delaySec = pow(2, MIN(5, self.retryAOAAttempt));
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delaySec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        [[Yodo1MasAppOpenAd sharedInstance] loadAd];
+    });
+	if (_onAppOpenAdFailedToLoad)
+		_onAppOpenAdFailedToLoad(error);
+}
+@end
+
 @implementation YARewardedAdDelegate
 
 - (void)onRewardAdOpened:(Yodo1MasRewardAd *)ad {

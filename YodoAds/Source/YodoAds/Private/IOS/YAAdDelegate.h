@@ -6,6 +6,7 @@
 #import <Yodo1MasCore/Yodo1Mas.h>
 #import <Yodo1MasCore/Yodo1MasInterstitialAd.h>
 #import <Yodo1MasCore/Yodo1MasRewardAd.h>
+#import <Yodo1MasCore/Yodo1MasAppOpenAd.h>
 #import <Yodo1MasCore/Yodo1MasBannerAdView.h>
 
 @interface YAInterstitialAdDelegate : NSObject <Yodo1MasInterstitialDelegate>
@@ -40,6 +41,22 @@
 @property (nonatomic, copy) void (^onRewardAdFailedToLoad)(Yodo1MasError* error);
 
 @property (nonatomic, copy) void (^onRewardAdEarned)();
+
+@end
+
+@interface YAAppopenAdDelegate : NSObject <Yodo1MasAppOpenAdDelegate>
+
+@property (nonatomic, assign) NSInteger retryAOAAttempt;
+
+@property (nonatomic, copy) void (^onAppOpenAdLoaded)();
+
+@property (nonatomic, copy) void (^onAppOpenAdOpened)();
+
+@property (nonatomic, copy) void (^onAppOpenAdClosed)();
+
+@property (nonatomic, copy) void (^onAppOpenAdFailedToOpen)(Yodo1MasError* error);
+
+@property (nonatomic, copy) void (^onAppOpenAdFailedToLoad)(Yodo1MasError* error);
 
 @end
 

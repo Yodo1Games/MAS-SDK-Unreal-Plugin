@@ -14,10 +14,15 @@
 #import <Yodo1MasCore/Yodo1Mas.h>
 #import <Yodo1MasCore/Yodo1MasInterstitialAd.h>
 #import <Yodo1MasCore/Yodo1MasRewardAd.h>
+#import <Yodo1MasCore/Yodo1MasAppOpenAd.h>
 #include "IOS/YAAdDelegate.h"
 #include "IOS/YAUtils.h"
 static YAInterstitialAdDelegate* InterstitialAdDelegate;
 static YARewardedAdDelegate* RewardedAdDelegate;
+static YAAppopenAdDelegate* AppopenAdDelegate;
+//static YAInterstitialAdRevenueDelegate* InterstitialAdRevenueDelegate;
+//static YARewardedAdRevenueDelegate* RewardedAdRevenueDelegate;
+//static YAAppOpenAdRevenueDelegate* AppOpenAdRevenueDelegate;
 #endif
 
 FYAVoidDelegate UYodoAdsLibrary::OnInitializeSuccess;
@@ -29,12 +34,23 @@ FYAVoidDelegate UYodoAdsLibrary::OnRewardedAdClosed;
 FYAVoidDelegate UYodoAdsLibrary::OnRewardedAdRewardEarned;
 FYAVoidDelegate UYodoAdsLibrary::OnRewardedAdLoaded;
 FYAErrorDelegate UYodoAdsLibrary::OnRewardAdFailedToLoad;
+FYAErrorDelegate UYodoAdsLibrary::OnRewardAdPayRevenue;
 
 FYAVoidDelegate UYodoAdsLibrary::OnInterstitialAdOpened;
 FYAErrorDelegate UYodoAdsLibrary::OnInterstitialAdError;
 FYAVoidDelegate UYodoAdsLibrary::OnInterstitialAdClosed;
 FYAVoidDelegate UYodoAdsLibrary::OnInterstitialAdLoaded;
 FYAErrorDelegate UYodoAdsLibrary::OnInterstitialAdFailedToLoad;
+FYAErrorDelegate UYodoAdsLibrary::OnInterstitialAdPayRevenue;
+
+FYAVoidDelegate UYodoAdsLibrary::OnAppOpenAdOpened;
+FYAErrorDelegate UYodoAdsLibrary::OnAppOpenAdError;
+FYAVoidDelegate UYodoAdsLibrary::OnAppOpenAdClosed;
+FYAVoidDelegate UYodoAdsLibrary::OnAppOpenAdLoaded;
+FYAErrorDelegate UYodoAdsLibrary::OnAppOpenAdFailedToLoad;
+FYAErrorDelegate UYodoAdsLibrary::OnAppOpenAdPayRevenue;
+
+
 
 const ANSICHAR* UYodoAdsLibrary::YodoAdsClassName = "com/ninevastudios/yodoads/YodoAds";
 
@@ -76,7 +92,11 @@ void UYodoAdsLibrary::Initialize(const FYAVoidDelegate& OnSuccess, const FYAErro
 		AsyncTask(ENamedThreads::GameThread, [=]() {
 			UYodoAdsLibrary::OnInitializeSuccess.ExecuteIfBound();
 			UE_LOG(LogYodoAds, Verbose, TEXT("UYodoAdsLibrary::Initialize Success"));
-[Yodo1MasRewardAd sharedInstance].autoDelayIfLoadFail = YES;
+			[Yodo1MasAppOpenAd sharedInstance].autoDelayIfLoadFail = YES;
+			dispatch_async(dispatch_get_main_queue(), ^{		
+				[[Yodo1MasAppOpenAd sharedInstance] loadAd];
+			});
+			[Yodo1MasRewardAd sharedInstance].autoDelayIfLoadFail = YES;
 			dispatch_async(dispatch_get_main_queue(), ^{		
 				[[Yodo1MasRewardAd sharedInstance] loadAd];
 			});
@@ -183,10 +203,22 @@ void UYodoAdsLibrary::SetRewardedAdListener(const FYAVoidDelegate& OnOpened, con
 	OnRewardedAdRewardEarned = OnRewardEarned;
 	OnRewardedAdLoaded = OnLoaded;
 	OnRewardAdFailedToLoad = OnLoadFailed;
+	//OnRewardAdPayRevenue = OnAdRevenue;
 
 #if PLATFORM_ANDROID
 	YAMethodCallUtils::CallStaticVoidMethod(YodoAdsClassName, "setRewardListener", "(Landroid/app/Activity;)V",FJavaWrapper::GameActivityThis, "");
 #elif PLATFORM_IOS
+
+	//RewardedAdRevenueDelegate = [YARewardedAdRevenueDelegate new];
+	//RewardedAdRevenueDelegate.onRewardAdPayRevenue = ^(Yodo1MasAdValue* value) {
+	//	FString Value = adValue.getRevenue().ToString()+"-"+adValue.getCurrency().ToString();
+	//	AsyncTask(ENamedThreads::GameThread, [=]() {
+	//		OnRewardAdPayRevenue.ExecuteIfBound(Value);
+	//	});
+	//};
+
+	//[Yodo1MasRewardAd sharedInstance].adRevenueDelegate = RewardedAdRevenueDelegate;
+
 	RewardedAdDelegate = [YARewardedAdDelegate new];
 	RewardedAdDelegate.onRewardAdOpened = ^() {
 		AsyncTask(ENamedThreads::GameThread, [=]() {
@@ -292,10 +324,20 @@ void UYodoAdsLibrary::SetInterstitialAdListener(const FYAVoidDelegate& OnOpened,
 	OnInterstitialAdClosed = OnClosed;
 	OnInterstitialAdLoaded = OnLoaded;
 	OnInterstitialAdFailedToLoad = OnLoadFailed;
+	//OnInterstitialAdPayRevenue = OnAdRevenue;
 
 #if PLATFORM_ANDROID
 	YAMethodCallUtils::CallStaticVoidMethod(YodoAdsClassName, "setInterstitialListener", "(Landroid/app/Activity;)V",FJavaWrapper::GameActivityThis, "");
 #elif PLATFORM_IOS
+	//InterstitialAdRevenueDelegate = [YAInterstitialAdRevenueDelegate new];
+	//InterstitialAdRevenueDelegate.onInterstitialAdPayRevenue = ^(Yodo1MasAdValue* value) {
+	//	FString Value = value.getRevenue().ToString()+"-"+value.getCurrency().ToString();
+		
+	//	AsyncTask(ENamedThreads::GameThread, [=]() {
+	//		OnInterstitialAdPayRevenue.ExecuteIfBound(value);
+	//	});
+	//};
+	//[Yodo1MasInterstitialAd sharedInstance].adRevenueDelegate = InterstitialAdRevenueDelegate;
 	InterstitialAdDelegate = [YAInterstitialAdDelegate new];
 	InterstitialAdDelegate.onInterstitialAdOpened = ^() {
 		AsyncTask(ENamedThreads::GameThread, [=]() {
@@ -328,6 +370,64 @@ void UYodoAdsLibrary::SetInterstitialAdListener(const FYAVoidDelegate& OnOpened,
 		});
 	};
 	[Yodo1MasInterstitialAd sharedInstance].adDelegate = InterstitialAdDelegate;
+#endif
+}
+void UYodoAdsLibrary::setAppOpenAdListener(const FYAVoidDelegate& OnOpened, const FYAErrorDelegate& OnError, const FYAVoidDelegate& OnClosed,const FYAVoidDelegate& OnLoaded,const FYAErrorDelegate& OnLoadFailed)
+{
+	UE_LOG(LogYodoAds, Verbose, TEXT("UYodoAdsLibrary::setAppOpenAdListener"));
+
+	OnAppOpenAdOpened = OnOpened;
+	OnAppOpenAdError = OnError;
+	OnAppOpenAdClosed = OnClosed;
+	OnAppOpenAdLoaded = OnLoaded;
+	OnAppOpenAdFailedToLoad = OnLoadFailed;
+	//OnAppOpenAdPayRevenue = OnAdRevenue;
+ 
+#if PLATFORM_ANDROID
+	YAMethodCallUtils::CallStaticVoidMethod(YodoAdsClassName, "setAppOpenAdListener", "(Landroid/app/Activity;)V",FJavaWrapper::GameActivityThis, "");
+#elif PLATFORM_IOS
+
+	//AppOpenAdRevenueDelegate = [YAAppOpenAdRevenueDelegate new];
+	//AppOpenAdRevenueDelegate.onAppOpenAdPayRevenue = ^(Yodo1MasAdValue* value) {
+	//	FString Value = adValue.getRevenue().ToString()+"-"+adValue.getCurrency().ToString();
+	//	AsyncTask(ENamedThreads::GameThread, [=]() {
+	//		OnAppOpenAdPayRevenue.ExecuteIfBound(Value);
+	//	});
+	//};
+	//[Yodo1MasAppOpenAd sharedInstance].adRevenueDelegate = AppOpenAdRevenueDelegate;
+
+	AppopenAdDelegate = [YAAppopenAdDelegate new];
+	AppopenAdDelegate.onAppOpenAdOpened = ^() {
+		AsyncTask(ENamedThreads::GameThread, [=]() {
+			OnAppOpenAdOpened.ExecuteIfBound();
+		});
+	};
+	AppopenAdDelegate.onAppOpenAdClosed = ^() {
+		AsyncTask(ENamedThreads::GameThread, [=]() {
+			OnAppOpenAdClosed.ExecuteIfBound();
+			UYodoAdsLibrary::LoadAppOpenAd();
+		});
+	};
+	AppopenAdDelegate.onAppOpenAdLoaded = ^() {
+		AsyncTask(ENamedThreads::GameThread, [=]() {
+			OnAppOpenAdLoaded.ExecuteIfBound();
+		});
+	};
+	AppopenAdDelegate.onAppOpenAdFailedToLoad = ^(Yodo1MasError* error) {
+		FString Error = YAUtils::ParseIosError(error);
+		
+		AsyncTask(ENamedThreads::GameThread, [=]() {
+			OnAppOpenAdFailedToLoad.ExecuteIfBound(Error);
+		});
+	};
+	AppopenAdDelegate.onAppOpenAdFailedToOpen = ^(Yodo1MasError* error) {
+		FString Error = YAUtils::ParseIosError(error);
+		
+		AsyncTask(ENamedThreads::GameThread, [=]() {
+			OnAppOpenAdError.ExecuteIfBound(Error);
+		});
+	};
+	[Yodo1MasAppOpenAd sharedInstance].adDelegate = AppopenAdDelegate;
 #endif
 }
 
@@ -367,6 +467,44 @@ void UYodoAdsLibrary::LoadInterstitialAd(const FString& Placement)
 #elif PLATFORM_IOS
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[[Yodo1MasInterstitialAd sharedInstance] loadAd];
+	});
+#endif
+}
+bool UYodoAdsLibrary::IsAppOpenAdLoaded()
+{
+	UE_LOG(LogYodoAds, Verbose, TEXT("UYodoAdsLibrary::IsAppOpenAdLoaded"));
+
+	bool Result = false;
+
+#if PLATFORM_ANDROID
+	Result = YAMethodCallUtils::CallStaticBoolMethod(YodoAdsClassName, "isAppOpenAdLoaded", "()Z");
+#elif PLATFORM_IOS
+	Result = [[Yodo1MasAppOpenAd sharedInstance] isLoaded];
+#endif
+
+	return Result;
+}
+void UYodoAdsLibrary::LoadAppOpenAd(const FString& Placement)
+{
+	UE_LOG(LogYodoAds, Verbose, TEXT("UYodoAdsLibrary::LoadAppOpenAd"));
+
+#if PLATFORM_ANDROID
+	YAMethodCallUtils::CallStaticVoidMethod(YodoAdsClassName, "loadAppOpenAd", "(Landroid/app/Activity;Ljava/lang/String;)V", FJavaWrapper::GameActivityThis, YAJavaConvertor::GetJavaString(Placement));
+#elif PLATFORM_IOS
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[[Yodo1MasAppOpenAd sharedInstance] loadAd];
+	});
+#endif
+}
+void UYodoAdsLibrary::ShowAppOpenAd(const FString& Placement)
+{
+	UE_LOG(LogYodoAds, Verbose, TEXT("UYodoAdsLibrary::ShowAppOpenAd"));
+
+#if PLATFORM_ANDROID
+	YAMethodCallUtils::CallStaticVoidMethod(YodoAdsClassName, "showAppOpenAd", "(Landroid/app/Activity;Ljava/lang/String;)V", FJavaWrapper::GameActivityThis, YAJavaConvertor::GetJavaString(Placement));
+#elif PLATFORM_IOS
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[[Yodo1MasAppOpenAd sharedInstance] showAd];
 	});
 #endif
 }
@@ -484,6 +622,44 @@ JNI_METHOD void Java_com_ninevastudios_yodoads_YodoAds_OnInterstitialAdFailedToL
 
 	AsyncTask(ENamedThreads::GameThread, [=]() {
 		UYodoAdsLibrary::OnInterstitialAdFailedToLoad.ExecuteIfBound(Error);
+	});
+}
+
+
+JNI_METHOD void Java_com_ninevastudios_yodoads_YodoAds_OnAppOpenAdOpened(JNIEnv* env, jclass clazz)
+{
+	AsyncTask(ENamedThreads::GameThread, [=]() {
+		UYodoAdsLibrary::OnAppOpenAdOpened.ExecuteIfBound();
+	});
+}
+
+JNI_METHOD void Java_com_ninevastudios_yodoads_YodoAds_OnAppOpenAdError(JNIEnv* env, jclass clazz, jstring error)
+{
+	FString Error = YAJavaConvertor::FromJavaString(error);
+
+	AsyncTask(ENamedThreads::GameThread, [=]() {
+		UYodoAdsLibrary::OnAppOpenAdError.ExecuteIfBound(Error);
+	});
+}
+
+JNI_METHOD void Java_com_ninevastudios_yodoads_YodoAds_OnAppOpenAdClosed(JNIEnv* env, jclass clazz)
+{
+	AsyncTask(ENamedThreads::GameThread, [=]() {
+		UYodoAdsLibrary::OnAppOpenAdClosed.ExecuteIfBound();
+	});
+}
+JNI_METHOD void Java_com_ninevastudios_yodoads_YodoAds_OnAppOpenAdLoaded(JNIEnv* env, jclass clazz)
+{
+	AsyncTask(ENamedThreads::GameThread, [=]() {
+		UYodoAdsLibrary::OnAppOpenAdLoaded.ExecuteIfBound();
+	});
+}
+JNI_METHOD void Java_com_ninevastudios_yodoads_YodoAds_OnAppOpenAdFailedToLoad(JNIEnv* env, jclass clazz, jstring error)
+{
+	FString Error = YAJavaConvertor::FromJavaString(error);
+
+	AsyncTask(ENamedThreads::GameThread, [=]() {
+		UYodoAdsLibrary::OnAppOpenAdFailedToLoad.ExecuteIfBound(Error);
 	});
 }
 #endif
