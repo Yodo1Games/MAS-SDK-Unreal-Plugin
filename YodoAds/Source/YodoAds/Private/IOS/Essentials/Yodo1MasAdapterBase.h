@@ -76,35 +76,35 @@ typedef NS_ENUM(NSInteger, Yodo1MasAdStatus) {
 - (void)updatePrivacy;
 - (NSString *)networkName;
 
-#pragma mark - 激励广告
+#pragma mark - Rewarded Ad
 @property (nonatomic, strong) NSMutableArray<Yodo1MasAdId *> *rewardAdIds;
 - (Class)rewardAdapterClass;
 - (Yodo1MasRewardAdapterBase *)getReward:(Yodo1MasAdId * _Nullable)adId;
 
-#pragma mark - 插屏广告
+#pragma mark - Interstitial Ad
 @property (nonatomic, strong) NSMutableArray<Yodo1MasAdId *> *interstitialAdIds;
 - (Class)interstitialAdapterClass;
 - (Yodo1MasInterstitialAdapterBase *)getInterstitial:(Yodo1MasAdId * _Nullable)adId;
 
-#pragma mark - 横幅广告
+#pragma mark - Banner Ad
 @property (nonatomic, strong, readonly) NSMutableArray<Yodo1MasAdId *> *bannerAdIds;
 - (Class)bannerAdapterClass;
 - (Yodo1MasBannerAdapterBase *)getBanner;
 - (BOOL)isBannerSizeSupport:(Yodo1MasBannerAdSize)size;
 - (BOOL)isMultipleBannerSupport;
 
-#pragma mark - 原生广告
+#pragma mark - Native Ad
 @property (nonatomic, strong, readonly) NSMutableArray<Yodo1MasAdId *> *nativeAdIds;
 @property (nonatomic, copy) NSString *nativeAdSize;
 - (Class)nativeAdapterClass;
 - (Yodo1MasNativeAdapterBase *)getNative;
 
-#pragma mark - 开屏广告
+#pragma mark - App Open Ad
 @property (nonatomic, strong, readonly) NSMutableArray<Yodo1MasAdId *> *appOpenAdIds;
 - (Class)appOpenAdapterClass;
 - (Yodo1MasAppOpenAdAdapterBase *)getAppOpen:(Yodo1MasAdId * _Nullable)adId;
 
-#pragma mark - 激励插屏广告
+#pragma mark - Rewarded Interstitial Ad
 @property (nonatomic, strong, readonly) NSMutableArray<Yodo1MasAdId *> *rewardedInterstitialAdIds;
 - (Class)rewardedInterstitialAdapterClass;
 - (Yodo1MasRewardedInterstitialAdAdapterBase *)getRewardedInterstitial;

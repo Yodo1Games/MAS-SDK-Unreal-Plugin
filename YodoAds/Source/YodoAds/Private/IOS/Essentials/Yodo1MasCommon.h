@@ -63,6 +63,7 @@ typedef NS_ENUM(NSInteger, Yodo1MasErrorCode) {
     Yodo1MasErrorCodeNotEUGeography = -700001, // Non-EU Geography
     Yodo1MasErrorCodeAdmobIdNotExist = -700002, // AdMob App ID was missing
     Yodo1MasErrorCodeConsentFormError = -700003, // Consent form error
+    Yodo1MasErrorCodeAttAuthorizationStatusDenied = -700004, // ATT ATTrackingManagerAuthorizationStatusDenied
 
 };
 

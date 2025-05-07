@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Yodo1MasCommon.h"
+#import "Yodo1MasTimeUtils.h"
 
 #define EVENT_APP_START         @"AppStart"
 #define EVENT_AD_INIT           @"adInit"

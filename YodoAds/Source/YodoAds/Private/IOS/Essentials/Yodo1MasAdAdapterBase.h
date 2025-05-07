@@ -34,8 +34,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *placement;
 @property (nonatomic, copy, nullable) NSString *customData;
 
-@property (nonatomic, assign) NSTimeInterval startLoadTime;
-@property (nonatomic, assign) NSTimeInterval endLoadTime;
+@property (nonatomic, assign) long long startLoadTime;
+@property (nonatomic, assign) long long endLoadTime;
+
+@property (nonatomic, copy) NSString *adSessionId;
 
 - (instancetype)init;
 
@@ -44,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (Yodo1MasAdPriceType)getPriceType;
 - (double)getEcpm; // eCPM
 - (BOOL)isClientBidding;
+- (BOOL)isBidder;
+
 - (Yodo1MasAdValue*)adValue;
 
 - (NSComparisonResult)compareECPM:(Yodo1MasAdAdapterBase *)adAdapter;
