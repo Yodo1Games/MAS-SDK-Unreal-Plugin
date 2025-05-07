@@ -1,4 +1,4 @@
-    //
+//
 //  Yodo1MasInterstitialAd.h
 //  Yodo1MasCore
 //

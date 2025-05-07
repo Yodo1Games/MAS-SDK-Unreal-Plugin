@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "4.14.0",
+	"VersionName": "4.15.0",
 	"FriendlyName": "YodoAds",
 	"Description": "Wrapper of native Android and iOS SDK's for Yodo MAS",
 	"Category": "Code Plugins",

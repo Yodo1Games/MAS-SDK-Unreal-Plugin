@@ -153,7 +153,8 @@ public static final ** CREATOR;
 -keep class com.yodo1.sensor.** {
 *;
 }
-
+-keep class **.R$* {
+}
 -keep public class * extends android.content.ContentProvider
 -keepnames class * extends android.view.View
 -keep class * extends android.app.Fragment {
@@ -217,8 +218,6 @@ public *;
 -dontwarn com.iab.**
 -keep class com.umeng.** {*;}
 -keep class com.uc.** {*;}
--keepclassmembers class * {
-
 -keepclassmembers enum * {
 public static **[] values();
 public static ** valueOf(java.lang.String);
@@ -238,6 +237,13 @@ public static ** valueOf(java.lang.String);
 -keep public class com.tradplus.** { *; }
 -keep class com.tradplus.ads.** { *; }
 -keep class com.ysocorp.ysonetwork.* { *; }
+-dontskipnonpubliclibraryclasses
+-keep class com.maticoo.sdk.**{*;}
+-keep class com.maticooad.sdk.**{*;}
+-keepattributes *Annotation*,InnerClasses
+-keepnames class * implements android.os.Parcelable {
+public static final ** CREATOR;
+}
     </insert>
   </proguardAdditions>
 
@@ -265,7 +271,7 @@ public static ** valueOf(java.lang.String);
    
         <insert>
             dependencies {
-         implementation 'com.yodo1.mas:full:4.14.0'
+         implementation 'com.yodo1.mas:full:4.15.0'
         </insert>
   
 
@@ -275,21 +281,13 @@ public static ** valueOf(java.lang.String);
           google()
           mavenCentral()
 
-          maven {
-            url "https://artifact.bytedance.com/repository/pangle/" // Assets/Yodo1/MAS/Editor/Dependencies/Yodo1MasAndroidDependencies.xml:10
-        }
-        maven {
-            url "https://android-sdk.is.com/" // Assets/Yodo1/MAS/Editor/Dependencies/Yodo1MasAndroidDependencies.xml:10
-        }
-        maven {
-            url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" // Assets/Yodo1/MAS/Editor/Dependencies/Yodo1MasAndroidDependencies.xml:10
-        }
-        maven {
-            url "https://artifactory.bidmachine.io/bidmachine" // Assets/Yodo1/MAS/Editor/Dependencies/Yodo1MasAndroidDependencies.xml:10
-        }
-        maven {
-            url "https://ysonetwork.s3.eu-west-3.amazonaws.com/sdk/android" // Assets/Yodo1/MAS/Editor/Dependencies/Yodo1MasAndroidDependencies.xml:10
-        }
+          maven { url "https://artifact.bytedance.com/repository/pangle" }
+          maven { url "https://android-sdk.is.com" }
+          maven { url "https://dl-maven-android.mintegral.com/repository/mbridge_android_sdk_oversea" }
+          maven { url "https://artifactory.bidmachine.io/bidmachine" }
+          maven { url "https://ysonetwork.s3.eu-west-3.amazonaws.com/sdk/android" }
+          maven { url "https://repo.pubmatic.com/artifactory/public-repos" }
+          maven { url "https://bitbucket.org/sdkcenter/sdkcenter/raw/release" }
       }
     </insert>
   </buildGradleAdditions>

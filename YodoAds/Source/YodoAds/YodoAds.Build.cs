@@ -118,7 +118,7 @@ public class YodoAds : ModuleRules
 			string ThirdPartyPath = Path.Combine(ModuleDirectory, "../ThirdParty");
 			string LibrariesPath = Path.Combine(ThirdPartyPath, "Libraries");
 
-			PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "libAmazonAdMarketplaceAdapter.a"));
+			//PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "libAmazonAdMarketplaceAdapter.a"));
 			//PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "libBidMachineAdapter.a"));
 			PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, "libBigoAdsAdapter.a"));
 
@@ -137,8 +137,6 @@ public class YodoAds : ModuleRules
 			//PublicAdditionalFrameworks.Add(new Framework("BUAdSDK", "../ThirdParty/BUAdSDK.embeddedframework.zip"));
 			//PublicAdditionalFrameworks.Add(new Framework("CSJMediation", "../ThirdParty/CSJMediation.embeddedframework.zip"));
 			//PublicAdditionalFrameworks.Add(new Framework("PAGAdSDK", "../ThirdParty/PAGAdSDK.embeddedframework.zip"));
-			PublicAdditionalFrameworks.Add(new Framework("DTBiOSSDK", "../ThirdParty/DTBiOSSDK.embeddedframework.zip",null,
-      true));
 			PublicAdditionalFrameworks.Add(new Framework("AppLovinSDK", "../ThirdParty/AppLovinSDK.embeddedframework.zip",null,
       true));
 			PublicAdditionalFrameworks.Add(new Framework("AFNetworking", "../ThirdParty/AFNetworking.embeddedframework.zip",null,
@@ -179,6 +177,12 @@ public class YodoAds : ModuleRules
 			PublicAdditionalFrameworks.Add(new Framework("MolocoSDK", "../ThirdParty/MolocoSDK.embeddedframework.zip",null,
       true));
 			PublicAdditionalFrameworks.Add(new Framework("OMSDK_Appodeal", "../ThirdParty/OMSDK_Appodeal.embeddedframework.zip",null,
+      true));
+	  PublicAdditionalFrameworks.Add(new Framework("OMSDK_Appodeal", "../ThirdParty/OMSDK_Pubmatic.embeddedframework.zip",null,
+      true));
+	  PublicAdditionalFrameworks.Add(new Framework("OMSDK_Appodeal", "../ThirdParty/OpenWrapMeasurement.embeddedframework.zip",null,
+      true));
+	  PublicAdditionalFrameworks.Add(new Framework("OMSDK_Appodeal", "../ThirdParty/OpenWrapSDK.embeddedframework.zip",null,
       true));
 			PublicAdditionalFrameworks.Add(new Framework("StackModules", "../ThirdParty/StackModules.embeddedframework.zip",null,
       true));
@@ -233,11 +237,14 @@ public class YodoAds : ModuleRules
       true));
 
 		    //PublicAdditionalFrameworks.Add(new Framework("PangleAdapter", "../ThirdParty/PangleAdapter.embeddedframework.zip"));
-			//PublicAdditionalFrameworks.Add(new Framework("Yodo1MasMediationPangle", "../ThirdParty/Yodo1MasMediationPangle.embeddedframework.zip"));
+			PublicAdditionalFrameworks.Add(new Framework("MaticooSDK", "../ThirdParty/MaticooSDK.embeddedframework.zip",null,
+      true));
+			PublicAdditionalFrameworks.Add(new Framework("Yodo1MasMediationMaticoo", "../ThirdParty/Yodo1MasMediationMaticoo.embeddedframework.zip",null,
+      true));
 			PublicAdditionalFrameworks.Add(new Framework("Yodo1MasMediationToBid", "../ThirdParty/Yodo1MasMediationToBid.embeddedframework.zip",null,
       true));
 
-			//PublicAdditionalFrameworks.Add(new Framework("Yodo1MasMediationTradPlus", "../ThirdParty/Yodo1MasMediationTradPlus.embeddedframework.zip"));
+			PublicAdditionalFrameworks.Add(new Framework("Yodo1MasMediationPubMatic", "../ThirdParty/Yodo1MasMediationPubMatic.embeddedframework.zip"));
 			PublicAdditionalFrameworks.Add(new Framework("Yodo1MasMediationUnityAds", "../ThirdParty/Yodo1MasMediationUnityAds.embeddedframework.zip",null,
       true));
 			PublicAdditionalFrameworks.Add(new Framework("UnityAdapter", "../ThirdParty/UnityAdapter.embeddedframework.zip",null,
@@ -252,8 +259,7 @@ public class YodoAds : ModuleRules
 			//PublicAdditionalFrameworks.Add(new Framework("Yodo1MasMediationYso", "../ThirdParty/Yodo1MasMediationYso.embeddedframework.zip"));
 			PublicAdditionalFrameworks.Add(new Framework("Yodo1MasCore", "../ThirdParty/Yodo1MasCore.embeddedframework.zip",null,
       true));
-			PublicAdditionalFrameworks.Add(new Framework("YYModel", "../ThirdParty/YYModel.embeddedframework.zip",null,
-      true));
+			
 
 			PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Private/IOS"));
 			string HeadersPath = Path.Combine(ModuleDirectory, "../ThirdParty", "Headers");

@@ -13,6 +13,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class Yodo1MasRewardedInterstitialAd;
+
+MAS_UNAVAILABLE_ATTRIBUTE
 @protocol Yodo1MasRewardedInterstitialAdDelegate <NSObject>
 
 @optional
@@ -25,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+MAS_UNAVAILABLE_ATTRIBUTE
 @protocol Yodo1MasRewardedInterstitialAdRevenueDelegate <NSObject>
 
 @optional
@@ -32,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+MAS_UNAVAILABLE_ATTRIBUTE
 @interface Yodo1MasRewardedInterstitialAd : NSObject
 
 @property (nonatomic, weak) id<Yodo1MasRewardedInterstitialAdDelegate> adDelegate;

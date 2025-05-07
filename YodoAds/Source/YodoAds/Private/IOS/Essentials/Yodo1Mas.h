@@ -107,7 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Yodo1Mas (Deprecated)
 
-@property (nonatomic, assign, readonly) BOOL isInit MAS_DEPRECATED_MSG_ATTRIBUTE("Use `isInitialized` instead");
+@property (nonatomic, assign, readonly) BOOL isInit MAS_UNAVAILABLE_MSG_ATTRIBUTE("Use `isInitialized` instead");
 
 @property (nonatomic, weak) id<Yodo1MasRewardAdDelegate> rewardAdDelegate MAS_UNAVAILABLE_MSG_ATTRIBUTE("Use `Yodo1MasRewardAd` instead");
 @property (nonatomic, weak) id<Yodo1MasInterstitialAdDelegate> interstitialAdDelegate MAS_UNAVAILABLE_MSG_ATTRIBUTE("Use `Yodo1MasInterstitialAd` instead");
