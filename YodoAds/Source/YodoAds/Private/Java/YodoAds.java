@@ -2,6 +2,8 @@ package com.ninevastudios.yodoads;
 
 
 import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -21,7 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.util.HashMap;
+import java.util.concurrent.FutureTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -107,12 +109,25 @@ public class YodoAds {
     public static native void OnAppOpenAdLoaded();
     public static native void OnAppOpenAdFailedToLoad(String error);
 
-	public static native void OnAppOpenAdFailedToOpen(String error);
+	public static native void OnAppOpenAdError(String error);
 
 	public static native void OnAppOpenAdClosed();
     public static native void OnAppOpenAdPayRevenue(Yodo1MasAdValue adValue);
 
-	static HashMap<String, Yodo1MasBannerAdView> bannerViews = new HashMap<>();
+	private static final String TAG = "YodoAds";
+	private static final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+	private static void runOnUi(Runnable r) {
+		if (Looper.myLooper() == Looper.getMainLooper()) {
+			r.run();
+		} else {
+			mainHandler.post(r);
+		}
+	}
+
+	private static String emptyToNull(String s) {
+		return TextUtils.isEmpty(s) ? null : s;
+	}
 
 
 
@@ -131,9 +146,6 @@ public class YodoAds {
 				
 
 		
-        Yodo1Mas.getInstance().setCCPA(false);
-        Yodo1Mas.getInstance().setGDPR(true);
-        Yodo1Mas.getInstance().setCOPPA(false);
 
 		Yodo1Mas.getInstance().setAdBuildConfig(builder.build());
             Yodo1Mas.InitListener initListener = new Yodo1Mas.InitListener() {
@@ -182,35 +194,38 @@ public class YodoAds {
 		return Yodo1Mas.getInstance().isCCPADoNotSell();
 	}
 
+	/**
+	 * Creates the banner view on the UI thread (it may host a WebView) and returns it to the caller.
+	 */
 	@Keep
-	public static Yodo1MasBannerAdView createBannerView(Activity activity) {
-		return new Yodo1MasBannerAdView(activity);
+	public static Yodo1MasBannerAdView createBannerView(final Activity activity, final int size) {
+		FutureTask<Yodo1MasBannerAdView> task = new FutureTask<>(() -> {
+			Yodo1MasBannerAdView view = new Yodo1MasBannerAdView(activity);
+			view.setAdSize(parseSize(size));
+			return view;
+		});
+		if (Looper.myLooper() == Looper.getMainLooper()) {
+			task.run();
+		} else {
+			activity.runOnUiThread(task);
+		}
+		try {
+			return task.get();
+		} catch (Exception e) {
+			Log.e(TAG, "createBannerView failed", e);
+			return null;
+		}
 	}
 
 	@Keep
-	public static void setBannerSize(Yodo1MasBannerAdView view, int size) {
-		view.setAdSize(parseSize(size));
+	public static void setBannerSize(final Yodo1MasBannerAdView view, final int size) {
+		runOnUi(() -> view.setAdSize(parseSize(size)));
 	}
-    @Keep
-    public static Yodo1MasBannerAdView addBannerToRootView(Activity activity, int size) {
-        // Get the root view of the activity
-        ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
 
-        // Create and configure the banner ad
-        Yodo1MasBannerAdView bannerAdView = createBannerView(activity);
-        setBannerSize(bannerAdView, size);
-
-        // Configure banner layout parameters
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(320, 50); // Adjust width/height if needed
-        params.setMargins(0, 0, 0, 0); // Adjust margins if needed
-
-        // Add the banner ad to the root view
-        rootView.addView(bannerAdView, params);
-
-        // Load the ad
-        bannerAdView.loadAd();
-        return bannerAdView;
-    }
+	@Keep
+	public static void setBannerPlacement(final Yodo1MasBannerAdView view, final String placement) {
+		runOnUi(() -> view.setAdPlacement(emptyToNull(placement)));
+	}
 
 	@Keep
 	public static float getBannerHeightInPixels(int adSize) {
@@ -230,87 +245,75 @@ public class YodoAds {
     }
 
 	@Keep
-	public static void setBannerCallbacksAndLoad(Yodo1MasBannerAdView view, final long pointer) {
-		view.setAdListener(new Yodo1MasBannerAdListener() {
-			@Override
-			public void onBannerAdLoaded(Yodo1MasBannerAdView bannerAdView) {
-				OnBannerAdLoaded(pointer);
-			}
+	public static void setBannerCallbacksAndLoad(final Yodo1MasBannerAdView view, final long pointer) {
+		runOnUi(() -> {
+			view.setAdListener(new Yodo1MasBannerAdListener() {
+				@Override
+				public void onBannerAdLoaded(Yodo1MasBannerAdView bannerAdView) {
+					OnBannerAdLoaded(pointer);
+				}
 
-			@Override
-			public void onBannerAdFailedToLoad(Yodo1MasBannerAdView bannerAdView, @NonNull Yodo1MasError error) {
-				OnBannerAdFailedToLoad(pointer, getErrorString(error));
-			}
+				@Override
+				public void onBannerAdFailedToLoad(Yodo1MasBannerAdView bannerAdView, @NonNull Yodo1MasError error) {
+					OnBannerAdFailedToLoad(pointer, getErrorString(error));
+				}
 
-			@Override
-			public void onBannerAdOpened(Yodo1MasBannerAdView bannerAdView) {
-				OnBannerAdOpened(pointer);
-			}
+				@Override
+				public void onBannerAdOpened(Yodo1MasBannerAdView bannerAdView) {
+					OnBannerAdOpened(pointer);
+				}
 
-			@Override
-			public void onBannerAdFailedToOpen(Yodo1MasBannerAdView bannerAdView, @NonNull Yodo1MasError error) {
-				OnBannerAdFailedToOpen(pointer, getErrorString(error));
-			}
+				@Override
+				public void onBannerAdFailedToOpen(Yodo1MasBannerAdView bannerAdView, @NonNull Yodo1MasError error) {
+					OnBannerAdFailedToOpen(pointer, getErrorString(error));
+				}
 
-			@Override
-			public void onBannerAdClosed(Yodo1MasBannerAdView bannerAdView) {
-				OnBannerAdClosed(pointer);
-			}
+				@Override
+				public void onBannerAdClosed(Yodo1MasBannerAdView bannerAdView) {
+					OnBannerAdClosed(pointer);
+				}
+			});
+			view.loadAd();
 		});
-
-		view.loadAd();
 	}
 
+	/**
+	 * alignmentHorizontal: 0 = Left, 1 = Center, 2 = Right (EYABannerHorizontalPosition)
+	 * alignmentVertical:   0 = Top,  1 = Center, 2 = Bottom (EYABannerVerticalPosition)
+	 */
 	@Keep
 	public static void showBannerAd(final Activity activity, final Yodo1MasBannerAdView view, final int bannerType, final int alignmentHorizontal,
 	                                final int alignmentVertical, final int offsetX, final int offsetY) {
-		activity.runOnUiThread(new Runnable() {
-			public void run() {
-				BannerAdConfig config = new BannerAdConfig();
-                
-				Yodo1MasBannerAdView adView = getBannerAdView(config.indexId);
-					if (adView != null) {
-						if (config.customAdPositionX > 0 && config.customAdPositionY > 0) {
-							Yodo1MasBannerUtil.addBannerView(activity, adView, Yodo1Mas.BannerLeft | Yodo1Mas.BannerTop, config.customAdPositionX, config.customAdPositionY);
-						} else {
-							Yodo1MasBannerUtil.addBannerView(activity, adView, config.adPosition);
-						}
-                }
+		activity.runOnUiThread(() -> {
+			int align;
+			switch (alignmentHorizontal) {
+				case 0: align = Yodo1Mas.BannerLeft; break;
+				case 2: align = Yodo1Mas.BannerRight; break;
+				default: align = Yodo1Mas.BannerHorizontalCenter; break;
 			}
-
-			});
-			
+			switch (alignmentVertical) {
+				case 0: align |= Yodo1Mas.BannerTop; break;
+				case 1: align |= Yodo1Mas.BannerVerticalCenter; break;
+				default: align |= Yodo1Mas.BannerBottom; break;
+			}
+			// Re-showing must not add the same view twice
+			Yodo1MasBannerUtil.removeBannerView(view);
+			if (offsetX != 0 || offsetY != 0) {
+				Yodo1MasBannerUtil.addBannerView(activity, view, align, offsetX, offsetY);
+			} else {
+				Yodo1MasBannerUtil.addBannerView(activity, view, align);
+			}
+		});
 	}
 
 	@Keep
 	public static void destroyBannerAd(Activity activity, final Yodo1MasBannerAdView view) {
-		activity.runOnUiThread(new Runnable() {
-			public void run() {
-				BannerAdConfig config = new BannerAdConfig();
-                
-                Yodo1MasBannerAdView adView = getBannerAdView(config.indexId);
-				if (adView == null) {
-                    return;
-                }
-				Yodo1MasBannerUtil.removeBannerView(adView);
-                adView.destroy();
-                bannerViews.remove(config.indexId);
-			}
-	});
+		activity.runOnUiThread(() -> {
+			Yodo1MasBannerUtil.removeBannerView(view);
+			view.destroy();
+		});
 	}
-	@Keep
-	private static Yodo1MasBannerAdView getBannerAdView(String indexId) {
-        if (bannerViews.isEmpty() || TextUtils.isEmpty(indexId)) {
-            return null;
-        }
 
-        for (String idx : bannerViews.keySet()) {
-            if (!idx.isEmpty() && idx.equals(indexId)) {
-                return bannerViews.get(idx);
-            }
-        }
-        return null;
-    }
 	@Keep
 	public static void setRewardListener(Activity activity) {
 		activity.runOnUiThread(new Runnable() {
@@ -432,7 +435,7 @@ public class YodoAds {
 
                     @Override
                     public void onAppOpenAdFailedToOpen(Yodo1MasAppOpenAd ad, @NonNull Yodo1MasError error) {
-                        OnAppOpenAdFailedToOpen(getErrorString(error));
+                        OnAppOpenAdError(getErrorString(error));
                     }
 
                     @Override
@@ -466,7 +469,7 @@ public class YodoAds {
                 //if (!config.parseAdConfig(jsonParam)) {
                   //  return;
                 //}
-                Yodo1MasRewardAd.getInstance().showAd(activity, config.adPlacement, config.customData);
+                Yodo1MasRewardAd.getInstance().showAd(activity, emptyToNull(placement), config.customData);
             }
         });
 	}
@@ -499,7 +502,7 @@ public class YodoAds {
                 //if (!config.parseAdConfig(jsonParam)) {
               //      return;
                 //}
-                Yodo1MasInterstitialAd.getInstance().showAd(activity, config.adPlacement, config.customData);
+                Yodo1MasInterstitialAd.getInstance().showAd(activity, emptyToNull(placement), config.customData);
             }
         });
 	}
@@ -528,7 +531,7 @@ public class YodoAds {
             @Override
             public void run() {
                 AppOpenAdConfig config = new AppOpenAdConfig();
-                Yodo1MasAppOpenAd.getInstance().showAd(activity, config.adPlacement, config.customData);
+                Yodo1MasAppOpenAd.getInstance().showAd(activity, emptyToNull(placement), config.customData);
             }
         });
 	}

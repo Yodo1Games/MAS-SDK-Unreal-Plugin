@@ -308,7 +308,7 @@ void UYodoAdsLibrary::LoadRewardedAd(const FString& Placement)
 	UE_LOG(LogYodoAds, Verbose, TEXT("UYodoAdsLibrary::LoadRewardedAd"));
 
 #if PLATFORM_ANDROID
-	YAMethodCallUtils::CallStaticVoidMethod(YodoAdsClassName, "loadRewardedAd", "(Landroid/app/Activity;)V", FJavaWrapper::GameActivityThis);
+	YAMethodCallUtils::CallStaticVoidMethod(YodoAdsClassName, "loadRewardedAd", "(Landroid/app/Activity;Ljava/lang/String;)V", FJavaWrapper::GameActivityThis, YAJavaConvertor::GetJavaString(Placement));
 #elif PLATFORM_IOS
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[[Yodo1MasRewardAd sharedInstance] loadAd];
@@ -515,10 +515,8 @@ UYodoAdsBanner* UYodoAdsLibrary::MakeBannerAd()
 	UYodoAdsBanner* Result = NewObject<UYodoAdsBanner>();
 
 #if PLATFORM_ANDROID
-	jobject javaBanner = YAMethodCallUtils::CallStaticObjectMethod(UYodoAdsLibrary::YodoAdsClassName, "addBannerToRootView","(Landroid/app/Activity;I)V", FJavaWrapper::GameActivityThis, 0);
-
-	//jobject javaBanner = YAMethodCallUtils::CallStaticObjectMethod(YodoAdsClassName, "addBannerToRootView", 
-		//"(Landroid/app/Activity;)Lcom/yodo1/mas/banner/Yodo1MasBannerAdView;", FJavaWrapper::GameActivityThis);
+	jobject javaBanner = YAMethodCallUtils::CallStaticObjectMethod(UYodoAdsLibrary::YodoAdsClassName, "createBannerView",
+		"(Landroid/app/Activity;I)Lcom/yodo1/mas/banner/Yodo1MasBannerAdView;", FJavaWrapper::GameActivityThis, (int) EYABannerSize::Banner);
 	Result->Init(javaBanner);
 #elif PLATFORM_IOS
 	Yodo1MasBannerAdView* Banner = [[Yodo1MasBannerAdView alloc] init];

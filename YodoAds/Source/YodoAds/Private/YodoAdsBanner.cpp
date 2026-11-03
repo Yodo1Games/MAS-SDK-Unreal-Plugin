@@ -26,7 +26,6 @@ void UYodoAdsBanner::SetSize(EYABannerSize Size)
 
 #if PLATFORM_ANDROID
 	YAMethodCallUtils::CallStaticVoidMethod(UYodoAdsLibrary::YodoAdsClassName, "setBannerSize","(Lcom/yodo1/mas/banner/Yodo1MasBannerAdView;I)V", JavaObject, (int) Size);
-	YAMethodCallUtils::CallStaticVoidMethod(UYodoAdsLibrary::YodoAdsClassName, "addBannerToRootView","(Lcom/yodo1/mas/banner/Yodo1MasBannerAdView;I)V", JavaObject, (int) Size);
 
 #elif PLATFORM_IOS
 	[((Yodo1MasBannerAdView*) IOSObject) setAdSize: (Yodo1MasBannerAdSize) Size];
@@ -41,8 +40,8 @@ void UYodoAdsBanner::SetPlacement(const FString& PlacementId)
 		return;
 
 #if PLATFORM_ANDROID
-	YAMethodCallUtils::CallVoidMethod(JavaObject, "setAdPlacement",
-		"(Ljava/lang/String;)V", YAJavaConvertor::GetJavaString(PlacementId));
+	YAMethodCallUtils::CallStaticVoidMethod(UYodoAdsLibrary::YodoAdsClassName, "setBannerPlacement",
+		"(Lcom/yodo1/mas/banner/Yodo1MasBannerAdView;Ljava/lang/String;)V", JavaObject, YAJavaConvertor::GetJavaString(PlacementId));
 #elif PLATFORM_IOS
 	[((Yodo1MasBannerAdView*) IOSObject) setAdPlacement:PlacementId.GetNSString()];
 #endif
