@@ -147,6 +147,12 @@ public class YodoAds {
 
 		
 
+		// Plugin defaults (COPPA false, GDPR true, CCPA false), applied only where the game
+		// hasn't already called SetCOPPA / SetGDPR / SetCCPA before Initialize.
+		if (!gdprSetByGame) Yodo1Mas.getInstance().setGDPR(true);
+		if (!coppaSetByGame) Yodo1Mas.getInstance().setCOPPA(false);
+		if (!ccpaSetByGame) Yodo1Mas.getInstance().setCCPA(false);
+
 		Yodo1Mas.getInstance().setAdBuildConfig(builder.build());
             Yodo1Mas.InitListener initListener = new Yodo1Mas.InitListener() {
             @Override
@@ -164,8 +170,13 @@ public class YodoAds {
 		Yodo1Mas.getInstance().initMas(activity, appKey, initListener);
     }
 
+	private static boolean gdprSetByGame = false;
+	private static boolean coppaSetByGame = false;
+	private static boolean ccpaSetByGame = false;
+
 	@Keep
 	public static void setGDPR(boolean userConsent) {
+		gdprSetByGame = true;
 		Yodo1Mas.getInstance().setGDPR(userConsent);
 	}
 
@@ -176,6 +187,7 @@ public class YodoAds {
 
 	@Keep
 	public static void setCOPPA(boolean ageRestricted) {
+		coppaSetByGame = true;
 		Yodo1Mas.getInstance().setCOPPA(ageRestricted);
 	}
 
@@ -186,6 +198,7 @@ public class YodoAds {
 
 	@Keep
 	public static void setCCPA(boolean doNotSell) {
+		ccpaSetByGame = true;
 		Yodo1Mas.getInstance().setCCPA(doNotSell);
 	}
 
