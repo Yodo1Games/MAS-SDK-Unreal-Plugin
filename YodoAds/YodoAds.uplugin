@@ -9,7 +9,6 @@
 	"CreatedByURL": "https://www.yodo1.com/",
 	"DocsURL": "https://developers.yodo1.com/docs/sdk/getting_started/installing/unreal",
 	"MarketplaceURL": "",
-	"EngineVersion": "5.5.1",
 	"SupportURL": "",
 	"CanContainContent": true,
 	"IsBetaVersion": false,
@@ -21,7 +20,7 @@
 			"Name": "YodoAds",
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
-			"WhitelistPlatforms": [ "Win64", "Mac", "Android", "IOS" ]
+			"PlatformAllowList": [ "Win64", "Mac", "Android", "IOS" ]
 		}
 	]
 }
