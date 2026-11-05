@@ -271,7 +271,7 @@ public static final ** CREATOR;
    
         <insert>
             dependencies {
-         implementation 'com.yodo1.mas:full:4.15.0'
+         implementation 'com.yodo1.mas:full:4.18.2'
         </insert>
   
 
@@ -287,6 +287,9 @@ public static final ** CREATOR;
           maven { url "https://artifactory.bidmachine.io/bidmachine" }
           maven { url "https://ysonetwork.s3.eu-west-3.amazonaws.com/sdk/android" }
           maven { url "https://repo.pubmatic.com/artifactory/public-repos" }
+          maven { url "https://cboost.jfrog.io/artifactory/chartboost-ads/" }
+          maven { url "https://jfrog.anythinktech.com/artifactory/overseas_sdk" }
+          maven { url "https://jitpack.io" }
           maven { url "https://bitbucket.org/sdkcenter/sdkcenter/raw/release" }
       }
     </insert>
@@ -324,11 +327,4 @@ public static final ** CREATOR;
     </insert>
   </baseBuildGradleAdditions>
 
-  <buildscriptGradleAdditions>
-    <insert>
-      dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.4'
-      }
-    </insert>
-  </buildscriptGradleAdditions>
 </root>
